@@ -1,0 +1,36 @@
+<!doctype html>
+<!--
+shows options for the extension
+ -->
+<html>
+  <head>
+    <title>HostSwitcher options</title>
+    <style>
+      body {
+        font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
+        font-size: 100%;
+      }
+      #status {
+        height: 25px;
+      }
+    </style>
+
+    <!--
+      - JavaScript and HTML must be in separate files: see our Content Security
+      - Policy documentation[1] for details and explanation.
+      -
+      - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
+     -->
+  </head>
+  <body>
+     <h1>HostSwitcher Options</h1>
+     <h2>Hosts</h2>
+     <div id="hosts">
+        <div id="saved_hosts"></div>
+        <input type="text" id="host_input"/>
+        <button id="save">Save</button>
+     </div>
+     <div id="status"></div>
+  </body>
+  <script src="options.js"></script>
+</html>
