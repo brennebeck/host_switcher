@@ -4,7 +4,7 @@
   "name": "HostSwitcher",
   "options_page": "options.html",
   "description": "Easily switch between hosts for the same path/endpoint.",
-  "version": "1.2.2",
+  "version": "1.2.3",
 
   "browser_action": {
     "default_icon": "icon.png",

@@ -19,7 +19,7 @@ function save_host() {
             setStatus('Host Saved');
             host_input.value = '';
             host_nicename_input.value = '';
-            var del_elm = host_wrapper.children[2];
+            var del_elm = host_wrapper.children[0];
             del_elm.addEventListener('click', function(e) { delete_host(e) });
             host_input.focus();
         });
@@ -46,8 +46,8 @@ function delete_host(e) {
     chrome.storage.sync.get({
         host_objects: {}
     }, function(items) {
-        d_host_nicename = e.srcElement.previousSibling.innerHTML;
-        d_hostname = e.srcElement.previousSibling.previousSibling.innerHTML;
+        d_host_nicename = e.srcElement.nextSibling.nextSibling.innerHTML;
+        d_hostname = e.srcElement.nextSibling.innerHTML;
         delete items.host_objects[d_host_nicename + d_hostname];
         chrome.storage.sync.set(items, function() {
             e.srcElement.parentNode.remove();
@@ -73,25 +73,33 @@ function restore_hosts(cb) {
 function appendHost(host_name, nice_name, element) {
     var host_wrapper = document.createElement('div');
     host_wrapper.className = 'host_wrapper';
-    var host_line = document.createElement('span');
-    var name_line = document.createElement('span');
-    host_line.className = 'host';
-    host_line.innerHTML = host_name;
-    name_line.className = 'host_nicename';
-    name_line.innerHTML = nice_name;
-    host_wrapper.appendChild(host_line);
-    host_wrapper.appendChild(name_line);
 
+    // add delete button
     var del = document.createElement('a');
     del.href = '#';
     del.innerHTML = 'X';
     del.className = 'delete';
     host_wrapper.appendChild(del);
+
+    // add hostname
+    var host_line = document.createElement('span');
+    host_line.className = 'host';
+    host_line.innerHTML = host_name;
+    host_wrapper.appendChild(host_line);
+
+    // add nicename
+    var name_line = document.createElement('span');
+    name_line.className = 'host_nicename';
+    name_line.innerHTML = nice_name;
+    host_wrapper.appendChild(name_line);
+
     element.appendChild(host_wrapper);
     return host_wrapper;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+
+    document.getElementById('host_input').focus();
     restore_hosts(function() {
         toArray(document.getElementsByClassName('delete')).map(function(elm) {
             elm.addEventListener('click', function(e) { delete_host(e) });
@@ -99,4 +107,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 document.getElementById('save').addEventListener('click', save_host);
-
