@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+var HTTP_REGEX = /^http(s)?:\/\//i
 /**
  * Get the current URL.
  *
@@ -59,11 +60,27 @@ function restore_hosts(cb) {
     });
 }
 
-function replace_host(host) {
+function replace_host(target_host) {
     getCurrentTabUrl(function(url, tab) {
-        var new_url = url.replace(url.substring(url.indexOf('/', url.indexOf('/') + 1) + 1,url.indexOf('/', url.indexOf('/') + 2)), host);
+        var target_http_leader = 'http://';
+        var source_http_leader = 'http://';
+        if (hasHTTP(url)) {
+            source_http_leader = HTTP_REGEX.exec(url)[0];
+        }
+        if (hasHTTP(target_host)) {
+            target_http_leader = HTTP_REGEX.exec(target_host)[0];
+            target_host = target_host.replace(target_http_leader, '');
+        }
+
+        var source_host = url.substring(url.indexOf('/', url.indexOf('/') + 1) + 1,url.indexOf('/', url.indexOf('/') + 2))
+        var new_url = url.replace(source_host, target_host);
+        new_url = new_url.replace(source_http_leader, target_http_leader);
         chrome.tabs.create({url:new_url, index: tab.index + 1});
     });
+}
+
+function hasHTTP(host) {
+   return HTTP_REGEX.test(host);
 }
 
 function appendHost(host_name, element) {
