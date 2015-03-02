@@ -41,10 +41,10 @@ function getCurrentTabUrl(callback) {
 
 function restore_hosts(cb) {
     chrome.storage.sync.get({
-        hosts: []
+        host_objects: []
     }, function(items) {
         var hosts_box = document.getElementById('hosts');
-        if (items.hosts.length <= 0) {
+        if (obj_keys(items.host_objects).length <= 0) {
             href = document.createElement('a');
             href.href = '#';
             href.innerHTML = 'Options';
@@ -54,12 +54,20 @@ function restore_hosts(cb) {
             document.getElementsByTagName('body')[0].appendChild(href);
             return;
         }
-        items.hosts.forEach(function(host) {
-            cb(appendHost(host, hosts_box));
-        });
+        for (key in items.host_objects) {
+            var host_object = items.host_objects[key];
+            cb(appendHost(host_object, hosts_box));
+        }
     });
 }
 
+function obj_keys(obj) {
+    keys = [];
+    for (key in obj) {
+        keys.push(key);
+    }
+    return keys;
+}
 function replace_host(target_host, cb) {
     getCurrentTabUrl(function(url, tab) {
         var target_http_leader = 'http://';
@@ -83,12 +91,19 @@ function hasHTTP(host) {
    return HTTP_REGEX.test(host);
 }
 
-function appendHost(host_name, element) {
+function appendHost(host_object, element) {
+    var display = host_object.hostname
+    if (host_object.nicename) {
+        display = host_object.nicename;
+    }
+
     var host_wrapper = document.createElement('div');
     var host_line = document.createElement('a');
     host_line.href = "#";
     host_line.className = 'host';
-    host_line.innerHTML = host_name;
+    host_line.title = host_object.hostname;
+    host_line.innerHTML = display;
+    host_line.setAttribute('data', host_object.hostname);
     host_wrapper.appendChild(host_line);
 
     element.appendChild(host_wrapper);
@@ -100,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
   restore_hosts(function(elm) {
       href = elm.children[0];
       href.addEventListener('click', function(e) {
-          replace_host(e.srcElement.innerHTML, function(new_url, tab) {
+          replace_host(e.srcElement.getAttribute('data'), function(new_url, tab) {
              chrome.tabs.create({url:new_url, index: tab.index + 1});
           });
       });

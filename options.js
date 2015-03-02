@@ -1,5 +1,6 @@
 function save_host() {
     var host_input = document.getElementById('host_input');
+    var host_nicename_input = document.getElementById('host_nicename_input');
 
     if (host_input.value == '') {
         setStatus('Cannot save empty host');
@@ -7,16 +8,18 @@ function save_host() {
     }
 
     chrome.storage.sync.get({
-        hosts: []
+        host_objects: {}
     }, function(items) {
-        items.hosts.push(host_input.value)
-        chrome.storage.sync.set({
-            hosts: items.hosts
-        }, function() {
-            var host_wrapper = appendHost(host_input.value, document.getElementById('saved_hosts'));
+        items.host_objects[host_nicename_input.value + host_input.value] = {
+            hostname: host_input.value,
+            nicename: host_nicename_input.value
+        }
+        chrome.storage.sync.set(items , function() {
+            var host_wrapper = appendHost(host_input.value, host_nicename_input.value, document.getElementById('saved_hosts'));
             setStatus('Host Saved');
             host_input.value = '';
-            var del_elm = host_wrapper.children[1];
+            host_nicename_input.value = '';
+            var del_elm = host_wrapper.children[2];
             del_elm.addEventListener('click', function(e) { delete_host(e) });
         });
     });
@@ -40,13 +43,12 @@ function toArray(obj) {
 
 function delete_host(e) {
     chrome.storage.sync.get({
-        hosts: []
+        host_objects: {}
     }, function(items) {
-        d_host = e.srcElement.previousSibling.innerHTML;
-        chrome.storage.sync.set({
-            hosts: items.hosts.filter(function(host){ return host != d_host && host != null})
-        }, function() {
-            beh = e;
+        d_host_nicename = e.srcElement.previousSibling.innerHTML;
+        d_hostname = e.srcElement.previousSibling.previousSibling.innerHTML;
+        delete items.host_objects[d_host_nicename + d_hostname];
+        chrome.storage.sync.set(items, function() {
             e.srcElement.parentNode.remove();
             setStatus('Host Deleted');
         });
@@ -56,22 +58,28 @@ function delete_host(e) {
 
 function restore_hosts(cb) {
     chrome.storage.sync.get({
-        hosts: []
+        host_objects: {}
     }, function(items) {
         var hosts_box = document.getElementById('saved_hosts');
-        items.hosts.forEach(function(host) {
-            appendHost(host, hosts_box);
-        });
+        for (key in items.host_objects) {
+            var host = items.host_objects[key];
+            appendHost(host.hostname, host.nicename, hosts_box);
+        }
         cb();
     });
 }
 
-function appendHost(host_name, element) {
+function appendHost(host_name, nice_name, element) {
     var host_wrapper = document.createElement('div');
+    host_wrapper.className = 'host_wrapper';
     var host_line = document.createElement('span');
+    var name_line = document.createElement('span');
     host_line.className = 'host';
     host_line.innerHTML = host_name;
+    name_line.className = 'host_nicename';
+    name_line.innerHTML = nice_name;
     host_wrapper.appendChild(host_line);
+    host_wrapper.appendChild(name_line);
 
     var del = document.createElement('a');
     del.href = '#';

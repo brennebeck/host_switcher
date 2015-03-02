@@ -13,6 +13,23 @@ shows options for the extension
       #status {
         height: 25px;
       }
+      .host,.host_nicename {
+          margin-right:10px;
+      }
+      .delete {
+          color: #d00;
+          text-decoration:none;
+      }
+      .host_wrapper {
+          margin-bottom:10px;
+      }
+      input {
+          font-size:20px;
+      }
+
+      input[type='text'] {
+        width: 300px;
+      }
     </style>
 
     <!--
@@ -25,11 +42,14 @@ shows options for the extension
   <body>
      <h1>HostSwitcher Options</h1>
      <h2>Hosts</h2>
-     <div id="hosts">
-        <div id="saved_hosts"></div>
-        <input type="text" id="host_input"/>
-        <button id="save">Save</button>
-     </div>
+     <form action="#">
+         <div id="hosts">
+            <div id="saved_hosts"></div>
+            <input type="text" placeholder="hostname" id="host_input"/>
+            <input type="text" placeholder="nicename(optional)" id="host_nicename_input"/>
+            <input type="submit" id="save" />
+         </div>
+     </form>
      <div id="status"></div>
   </body>
   <script src="options.js"></script>
