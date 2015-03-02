@@ -3,7 +3,7 @@
 
   "name": "HostSwitcher",
   "options_page": "options.html",
-  "description": "Switches the hostname of the url you are looking at",
+  "description": "Easily switch between hosts for the same path/endpoint.",
   "version": "1.0",
 
   "browser_action": {
