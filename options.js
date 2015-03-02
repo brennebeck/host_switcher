@@ -21,6 +21,7 @@ function save_host() {
             host_nicename_input.value = '';
             var del_elm = host_wrapper.children[2];
             del_elm.addEventListener('click', function(e) { delete_host(e) });
+            host_input.focus();
         });
     });
 }
