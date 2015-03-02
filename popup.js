@@ -60,7 +60,7 @@ function restore_hosts(cb) {
     });
 }
 
-function replace_host(target_host) {
+function replace_host(target_host, cb) {
     getCurrentTabUrl(function(url, tab) {
         var target_http_leader = 'http://';
         var source_http_leader = 'http://';
@@ -75,7 +75,7 @@ function replace_host(target_host) {
         var source_host = url.substring(url.indexOf('/', url.indexOf('/') + 1) + 1,url.indexOf('/', url.indexOf('/') + 2))
         var new_url = url.replace(source_host, target_host);
         new_url = new_url.replace(source_http_leader, target_http_leader);
-        chrome.tabs.create({url:new_url, index: tab.index + 1});
+        cb(new_url, tab);
     });
 }
 
@@ -100,8 +100,9 @@ document.addEventListener('DOMContentLoaded', function() {
   restore_hosts(function(elm) {
       href = elm.children[0];
       href.addEventListener('click', function(e) {
-          replace_host(e.srcElement.innerHTML)
-          beh = e.srcElement.innerHTML;
+          replace_host(e.srcElement.innerHTML, function(new_url, tab) {
+             chrome.tabs.create({url:new_url, index: tab.index + 1});
+          });
       });
   })
 });
